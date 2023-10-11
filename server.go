@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"godoku/solve"
 )
 
 func main() {
@@ -15,7 +16,12 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.GET("/", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, "Hello from Godoku! <3")	
+		m := solve.NewMat()
+		m.MockMat()
+		ints := m.GetPossibleSquareValues(8,1)
+		fmt.Println(ints)
+		//return c.HTML(http.StatusOK, "Hello from Godoku! <3")
+		return c.String(200, m.String())
 	})
 
 	e.GET("/health", func(c echo.Context) error {
