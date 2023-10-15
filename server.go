@@ -18,10 +18,11 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		m := solve.NewMat()
 		m.MockMat()
-		ints := m.GetPossibleSquareValues(8,1)
-		fmt.Println(ints)
-		//return c.HTML(http.StatusOK, "Hello from Godoku! <3")
-		return c.String(200, m.String())
+		err := m.Solve()
+		if err != nil {
+			return err
+		}		
+		return c.String(200, m.String() + fmt.Sprintf("\nToggle Count = %d\n", solve.ToggleCount)) 
 	})
 
 	e.GET("/health", func(c echo.Context) error {
