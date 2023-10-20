@@ -17,7 +17,7 @@ func main() {
 
 	e.GET("/", func(c echo.Context) error {
 		m := solve.NewMat()
-		m.MockMat()
+		m.MockMat(solve.HARDEST, 1)
 		err := m.Solve()
 		if err != nil {
 			return err

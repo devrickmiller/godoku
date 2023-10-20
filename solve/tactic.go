@@ -13,6 +13,16 @@ type SquareGroup struct {
 
 type SquareGroupSet []SquareGroup
 
+func (m *Mat) EliminateGroupedValues() {
+	m.AdjustMatFromSolvedSquares()
+	m.EliminateGroupedRowValues()
+	m.AdjustMatFromSolvedSquares()
+	m.EliminateGroupedColValues()
+	m.AdjustMatFromSolvedSquares()
+	m.EliminateGroupedBlockValues()		
+	m.AdjustMatFromSolvedSquares()	
+}
+
 func (m *Mat) EliminateGroupedRowValues() {
 	for r := 0; r < 9; r++ {
 		squares := GetRowSquares(r)
@@ -134,10 +144,59 @@ func GetBlockSquares(b int) []Square {
 }
 
 
+func (m *Mat) SetUniqueValues() {
+	m.AdjustMatFromSolvedSquares()
+	m.SetUniqueRowValues()
+	m.AdjustMatFromSolvedSquares()
+	m.SetUniqueColValues()
+	m.AdjustMatFromSolvedSquares()
+	m.SetUniqueBlockValues()	
+	m.AdjustMatFromSolvedSquares()		
+}
 
+// SetUniqueRowValues
+func (m *Mat) SetUniqueRowValues() {
+	for r := 0; r < 9; r++ {
+		squares := GetRowSquares(r)
+		m.SetUniqueValuesForSquares(squares)
+	}
+}
 
-// eliminate grouped possible numbers for a given set
-// find groups in set
-// for each set eliminate grouped numbers for squares not in given group
-	//get numbers for given group
-	//eliminate those numbers for all other squares in group
+// SetUniqueColValues
+func (m *Mat) SetUniqueColValues() {
+	for c := 0; c < 9; c++ {
+		squares := GetColSquares(c)
+		m.SetUniqueValuesForSquares(squares)
+	}
+}
+
+// SetUniqueBlockValues
+func (m *Mat) SetUniqueBlockValues() {
+	for b := 0; b < 9; b++ {
+		squares := GetBlockSquares(b)
+		m.SetUniqueValuesForSquares(squares)
+	}
+}
+// SetUniqueValuesForSquares
+
+func (m *Mat) SetUniqueValuesForSquares(squares []Square) {
+	for n := 0; n < 9; n++ {
+		foundIndex := -1
+		occurs := 0
+		for i, s := range squares {
+			if m[s.Row][s.Col][n] {
+				foundIndex = i
+				occurs++
+			}
+		}
+		if occurs == 0 {
+			panic("this should never happen")
+		}
+		if occurs == 1 {
+			if len(m.GetPossibleSquareValues(squares[foundIndex])) > 1 {
+				m.SetSquare(squares[foundIndex], n)
+			}
+		}
+	}
+
+}

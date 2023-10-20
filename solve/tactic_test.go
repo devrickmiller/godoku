@@ -35,7 +35,7 @@ func TestGetColSquares(t *testing.T) {
 
 func TestGetBlockSquares(t *testing.T) {
 	want := []Square{{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2},}
-	got := GetBlockSquares(Square{0,0})
+	got := GetBlockSquares(0)
 
 	if len(got) != 9 {
 		t.Error("returned too many Squares")

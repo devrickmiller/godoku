@@ -12,55 +12,22 @@ type Square struct {
 	Col    int
 }
 
+var P = fmt.Println
+
 var ToggleCount int = 0
 
 func (m *Mat) Solve() error {
 	tc := 0
+
 	for tc < ToggleCount {
 		tc = ToggleCount
-		m.AdjustMatFromSolvedSquares()
-		m.EliminateGroupedRowValues()
-		m.AdjustMatFromSolvedSquares()
-		m.EliminateGroupedColValues()
-		m.AdjustMatFromSolvedSquares()
-		m.EliminateGroupedBlockValues()		
-		m.AdjustMatFromSolvedSquares()
-		fmt.Println("ToggleCount = ", ToggleCount)
+		m.SetUniqueValues()
+		m.EliminateGroupedValues()
+
+		P("ToggleCount = ", ToggleCount)
 	}
 
 	return nil
-}
-
-func (m *Mat) MockMat() {
-	// m.SetRow(0,[]int{2,-1,-1,3,-1,-1,8,-1,1})
-	// m.SetRow(1,[]int{-1,-1,-1,-1,-1,2,-1,-1,-1})
-	// m.SetRow(2,[]int{-1,4,-1,-1,-1,9,-1,-1,-1})
-	// m.SetRow(3,[]int{-1,-1,8,-1,-1,1,3,6,-1})
-	// m.SetRow(4,[]int{1,7,-1,-1,-1,-1,-1,-1,-1})
-	// m.SetRow(5,[]int{3,6,-1,8,-1,-1,-1,-1,-1})
-	// m.SetRow(6,[]int{-1,9,-1,1,4,7,-1,2,-1})
-	// m.SetRow(7,[]int{6,3,-1,-1,2,-1,-1,4,1})
-	// m.SetRow(8,[]int{-1,-1,-1,-1,-1,-1,9,-1,-1})
-
-	m.SetRow(0,[]int{2,-1,-1,3,-1,-1,8,-1,-1})
-	m.SetRow(1,[]int{-1,-1,-1,-1,-1,2,-1,-1,-1})
-	m.SetRow(2,[]int{-1,4,-1,-1,-1,9,-1,-1,-1})
-	m.SetRow(3,[]int{-1,-1,8,-1,-1,1,3,6,-1})
-	m.SetRow(4,[]int{1,7,-1,-1,-1,-1,-1,-1,-1})
-	m.SetRow(5,[]int{3,6,-1,8,-1,-1,-1,-1,-1})
-	m.SetRow(6,[]int{-1,9,-1,1,4,7,-1,2,-1})
-	m.SetRow(7,[]int{6,3,-1,-1,2,-1,-1,4,1})
-	m.SetRow(8,[]int{-1,-1,-1,-1,-1,-1,9,-1,-1})	
-
-	// m.SetRow(0,[]int{-1,6,4,-1,9,5,-1,-1,-1})
-	// m.SetRow(1,[]int{5,-1,8,-1,-1,1,4,7,-1})
-	// m.SetRow(2,[]int{9,1,2,-1,3,4,5,6,-1})
-	// m.SetRow(3,[]int{-1,7,3,-1,6,-1,2,9,-1})
-	// m.SetRow(4,[]int{6,-1,-1,-1,5,2,8,-1,7})
-	// m.SetRow(5,[]int{-1,2,5,-1,-1,3,-1,4,1})
-	// m.SetRow(6,[]int{-1,4,-1,2,8,9,7,-1,-1})
-	// m.SetRow(7,[]int{3,-1,-1,5,-1,-1,-1,-1,6})
-	// m.SetRow(8,[]int{2,-1,7,-1,1,-1,-1,8,-1})		
 }
 
 func (m *Mat) GetPossibleSquareValues(s Square) [] int {
@@ -93,7 +60,8 @@ func (m *Mat) AdjustMatFromSolvedSquares() {
 	for r := 0; r < 9; r++ {
 		for c := 0; c < 9; c++ {
 			s := Square{r,c}
-			valCount := len(m.GetPossibleSquareValues(s))
+			vals := m.GetPossibleSquareValues(s)
+			valCount := len(vals)
 			if valCount < 1 {
 				fmt.Println("AdjustMatFromSolvedSquares() : s = ", s)
 				panic("AdjustMatFromSolvedSquares() : valCount < 1")
@@ -105,16 +73,24 @@ func (m *Mat) AdjustMatFromSolvedSquares() {
 }
 
 func (m *Mat) toggleOffRelatedSquares(s Square) {
+	dbug := Square{4,7}
+	if s == dbug {
+		P("problem square encountered")
+	}	
 	vals := m.GetPossibleSquareValues(s)
 	n := vals[0]
 	if len(vals) == 1 {
 		for i := 0; i < 9; i++ {
-			if i != s.Col {
-				m.toggleOffSquare(Square{s.Row,i},n)
-			}
 			if i != s.Row {
 				m.toggleOffSquare(Square{i,s.Col},n)
 			}
+			if i != s.Col {
+				m.toggleOffSquare(Square{s.Row,i},n)
+			}
+		}
+		if s == dbug {
+			dbSquare := m.GetPossibleSquareValues(Square{1,8})
+			P(dbSquare)
 		}
 		m.setOtherTriBlockSquares(s, n)
 	} else if len(vals) < 1 {
